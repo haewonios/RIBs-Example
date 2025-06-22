@@ -1,40 +1,35 @@
 //
-//  RootInteractor.swift
+//  LogInInteractor.swift
 //  RIBs-Example
 //
-//  Created by hyewon on 2025/06/21.
+//  Created by hyewon on 2025/06/22.
 //
 
 import RIBs
 import RxSwift
 
-protocol RootRouting: ViewableRouting {
+protocol LogInRouting: ViewableRouting {
     // TODO: Declare methods the interactor can invoke to manage sub-tree via the router.
-    func attachLogin()
-    func detachLogin()
 }
 
-protocol RootPresentable: Presentable {
-    var listener: RootPresentableListener? { get set }
+protocol LogInPresentable: Presentable {
+    var listener: LogInPresentableListener? { get set }
     // TODO: Declare methods the interactor can invoke the presenter to present data.
 }
 
-protocol RootListener: AnyObject {
+protocol LogInListener: AnyObject {
     // TODO: Declare methods the interactor can invoke to communicate with other RIBs.
+    func didTapBackButton()
 }
 
-final class RootInteractor:
-    PresentableInteractor<RootPresentable>,
-    RootInteractable,
-    RootPresentableListener
-{
+final class LogInInteractor: PresentableInteractor<LogInPresentable>, LogInInteractable, LogInPresentableListener {
 
-    weak var router: RootRouting?
-    weak var listener: RootListener?
+    weak var router: LogInRouting?
+    weak var listener: LogInListener?
 
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
-    override init(presenter: RootPresentable) {
+    override init(presenter: LogInPresentable) {
         super.init(presenter: presenter)
         presenter.listener = self
     }
@@ -50,13 +45,8 @@ final class RootInteractor:
     }
 }
 
-extension RootInteractor {
-    func didTapLoginButton() {
-        router?.attachLogin()
-    }
-    
-    // LoginInteractor
+extension LogInInteractor {
     func didTapBackButton() {
-        router?.detachLogin()
+        listener?.didTapBackButton()
     }
 }
