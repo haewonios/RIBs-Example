@@ -32,8 +32,13 @@ final class LogInBuilder: Builder<LogInDependency>, LogInBuildable {
     func build(withListener listener: LogInListener) -> LogInRouting {
         let component = LogInComponent(dependency: dependency)
         let viewController = LogInViewController()
-        let interactor = LogInInteractor(presenter: viewController)
+        let recordAudioUseCase = RecordAudioUseCase(recorder: .shared)
+        let interactor = LogInInteractor(
+            presenter: viewController,
+            recordAudioUseCase: recordAudioUseCase
+        )
         interactor.listener = listener
+        
         return LogInRouter(interactor: interactor, viewController: viewController)
     }
 }

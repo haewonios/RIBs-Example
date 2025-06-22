@@ -15,6 +15,7 @@ protocol LogInRouting: ViewableRouting {
 protocol LogInPresentable: Presentable {
     var listener: LogInPresentableListener? { get set }
     // TODO: Declare methods the interactor can invoke the presenter to present data.
+    func updateRecordButtonTitle(_ title: String)
 }
 
 protocol LogInListener: AnyObject {
@@ -26,10 +27,16 @@ final class LogInInteractor: PresentableInteractor<LogInPresentable>, LogInInter
 
     weak var router: LogInRouting?
     weak var listener: LogInListener?
+    
+    private let useCase: RecordAudioUseCaseProtocol
 
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
-    override init(presenter: LogInPresentable) {
+    init(
+        presenter: LogInPresentable,
+        recordAudioUseCase: RecordAudioUseCaseProtocol
+    ) {
+        self.useCase = recordAudioUseCase
         super.init(presenter: presenter)
         presenter.listener = self
     }
@@ -48,5 +55,28 @@ final class LogInInteractor: PresentableInteractor<LogInPresentable>, LogInInter
 extension LogInInteractor {
     func didTapBackButton() {
         listener?.didTapBackButton()
+    }
+    
+    func didTapRecordButton() async {
+        let permission = await useCase.checkPermission()
+        if !permission {
+            print("denied :(")
+            return
+        }
+        
+        if useCase.isRecoring {
+            let state = useCase.stopRecording()
+            presenter.updateRecordButtonTitle("녹음 완료")
+            print("state: \(state)")
+        } else {
+            do {
+                try useCase.startRecording()
+                presenter.updateRecordButtonTitle("녹음중...")
+            } catch {
+                print("error! \(error)")
+                presenter.updateRecordButtonTitle("녹음중 오류가 발생했습니다.")
+            }
+        }
+        
     }
 }
